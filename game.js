@@ -721,18 +721,34 @@ class TexasHoldem {
         const raiseBtn = document.getElementById('raise-btn');
         const raiseInput = document.getElementById('raise-amount');
 
+        // 全てのボタンを有効化
+        foldBtn.disabled = false;
+        checkBtn.disabled = false;
+        callBtn.disabled = false;
+        raiseBtn.disabled = false;
+        raiseInput.disabled = false;
+
         document.getElementById('call-amount').textContent = toCall;
 
         if (toCall === 0) {
-            checkBtn.style.display = 'inline-block';
+            checkBtn.style.display = 'inline-flex';
             callBtn.style.display = 'none';
         } else {
             checkBtn.style.display = 'none';
-            callBtn.style.display = 'inline-block';
+            callBtn.style.display = 'inline-flex';
         }
 
         raiseInput.min = minRaise;
         raiseInput.value = minRaise;
+    }
+
+    disablePlayerActions() {
+        // 全てのボタンを無効化
+        document.getElementById('fold-btn').disabled = true;
+        document.getElementById('check-btn').disabled = true;
+        document.getElementById('call-btn').disabled = true;
+        document.getElementById('raise-btn').disabled = true;
+        document.getElementById('raise-amount').disabled = true;
     }
 
     log(message, important = false) {
@@ -773,6 +789,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // アクションボタン
     document.getElementById('fold-btn').addEventListener('click', () => {
         if (game && game.waitingForHumanAction) {
+            game.disablePlayerActions();
             game.waitingForHumanAction = false;
             game.executeAction(game.humanPlayer, 'fold', 0, 0);
             game.resolveHumanAction();
@@ -781,6 +798,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('check-btn').addEventListener('click', () => {
         if (game && game.waitingForHumanAction) {
+            game.disablePlayerActions();
             game.waitingForHumanAction = false;
             game.executeAction(game.humanPlayer, 'check', 0, 0);
             game.resolveHumanAction();
@@ -789,6 +807,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('call-btn').addEventListener('click', () => {
         if (game && game.waitingForHumanAction) {
+            game.disablePlayerActions();
             const toCall = game.currentBet - game.humanPlayer.currentBet;
             game.waitingForHumanAction = false;
             game.executeAction(game.humanPlayer, 'call', toCall, toCall);
@@ -798,6 +817,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('raise-btn').addEventListener('click', () => {
         if (game && game.waitingForHumanAction) {
+            game.disablePlayerActions();
             const raiseAmount = parseInt(document.getElementById('raise-amount').value);
             const toCall = game.currentBet - game.humanPlayer.currentBet;
             game.waitingForHumanAction = false;
