@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>テキサスホールデム ポーカー</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- ゲーム開始画面 -->
+    <div id="start-screen" class="screen active">
+        <div class="start-container">
+            <h1>🎰 テキサスホールデム ポーカー 🎰</h1>
+            <div class="form-group">
+                <label for="player-name">プレイヤー名:</label>
+                <input type="text" id="player-name" placeholder="あなたの名前" value="プレイヤー">
+            </div>
+            <div class="form-group">
+                <label for="starting-chips">初期チップ:</label>
+                <input type="number" id="starting-chips" value="1000" min="100" step="100">
+            </div>
+            <button id="start-game-btn" class="btn btn-start">ゲーム開始</button>
+        </div>
+    </div>
+
+    <!-- ゲーム画面 -->
+    <div id="game-screen" class="screen">
+        <div class="poker-table-container">
+            <!-- ポーカーテーブル -->
+            <div class="poker-table">
+                <!-- テーブル上部の情報 -->
+                <div class="table-info">
+                    <div class="pot-info">
+                        <div class="pot-label">POT</div>
+                        <div class="pot-amount" id="pot">0</div>
+                        <div class="current-bet-display">現在のベット: <span id="current-bet">0</span></div>
+                    </div>
+                    <div class="stage-info" id="game-stage"></div>
+                </div>
+
+                <!-- コミュニティカード -->
+                <div class="community-area">
+                    <div id="community-cards" class="cards-container"></div>
+                </div>
+
+                <!-- AIプレイヤーエリア -->
+                <div id="ai-players" class="ai-players-area"></div>
+
+                <!-- 人間プレイヤーエリア -->
+                <div class="human-player-area">
+                    <div class="player-cards-section">
+                        <div id="player-cards" class="cards-container"></div>
+                        <div id="player-hand-rank" class="hand-rank"></div>
+                    </div>
+                    <div class="player-info-section">
+                        <div class="player-name-chip">
+                            <h3 id="player-name-display">プレイヤー</h3>
+                            <div class="chip-stack">
+                                <span class="chip-icon">🪙</span>
+                                <span id="player-chips">1000</span>
+                            </div>
+                        </div>
+                        <div class="current-bet">
+                            ベット: <span id="player-bet">0</span>
+                        </div>
+                        <div id="player-status" class="player-status"></div>
+                    </div>
+                </div>
+
+                <!-- アクションボタン -->
+                <div class="action-panel" id="player-actions">
+                    <button id="fold-btn" class="action-btn fold-btn">
+                        <span class="btn-icon">🚫</span>
+                        <span>フォールド</span>
+                    </button>
+                    <button id="check-btn" class="action-btn check-btn">
+                        <span class="btn-icon">✓</span>
+                        <span>チェック</span>
+                    </button>
+                    <button id="call-btn" class="action-btn call-btn">
+                        <span class="btn-icon">💰</span>
+                        <span>コール (<span id="call-amount">0</span>)</span>
+                    </button>
+                    <div class="raise-section">
+                        <input type="number" id="raise-amount" min="0" step="10" value="20">
+                        <button id="raise-btn" class="action-btn raise-btn">
+                            <span class="btn-icon">⬆️</span>
+                            <span>レイズ</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- サイドパネル（ログ） -->
+            <div class="side-panel">
+                <h3>ゲームログ</h3>
+                <div id="message-log" class="message-log"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 結果画面 -->
+    <div id="result-screen" class="screen">
+        <div class="result-container">
+            <h2>🏆 ショーダウン 🏆</h2>
+            <div id="result-content" class="result-content"></div>
+            <div class="result-actions">
+                <button id="next-hand-btn" class="btn btn-next">次のハンド</button>
+                <button id="quit-game-btn" class="btn btn-quit">ゲーム終了</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ゲームオーバー画面 -->
+    <div id="game-over-screen" class="screen">
+        <div class="game-over-container">
+            <h2>ゲーム終了</h2>
+            <div id="game-over-content"></div>
+            <button id="restart-game-btn" class="btn btn-start">新しいゲーム</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
