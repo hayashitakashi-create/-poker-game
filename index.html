@@ -11,6 +11,11 @@
     <div id="start-screen" class="screen active">
         <div class="start-container">
             <h1>🎰 テキサスホールデム ポーカー 🎰</h1>
+            <div id="saved-game-info" style="display: none; background: rgba(76, 175, 80, 0.2); padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 2px solid #4caf50;">
+                <div style="color: #4caf50; font-weight: bold; margin-bottom: 5px;">💾 セーブデータあり</div>
+                <div style="color: #ffd700;">プレイヤー: <span id="saved-player-name"></span></div>
+                <div style="color: #ffd700;">チップ: <span id="saved-chips"></span></div>
+            </div>
             <div class="form-group">
                 <label for="player-name">プレイヤー名:</label>
                 <input type="text" id="player-name" placeholder="あなたの名前" value="プレイヤー">
@@ -20,6 +25,7 @@
                 <input type="number" id="starting-chips" value="1000" min="100" step="100">
             </div>
             <button id="start-game-btn" class="btn btn-start">ゲーム開始</button>
+            <button id="reset-save-btn" class="btn btn-quit" style="display: none; margin-top: 15px;">最初からやり直す</button>
         </div>
     </div>
 

@@ -346,13 +346,20 @@ class TexasHoldem {
     }
 
     initialize(playerName, startingChips) {
+        // 保存されたチップ数を読み込む
+        const savedChips = localStorage.getItem('poker_player_chips');
+        const playerChips = savedChips ? parseInt(savedChips) : startingChips;
+
         this.players = [
-            new Player(playerName, startingChips, true),
+            new Player(playerName, playerChips, true),
             new Player('AI_1', startingChips),
             new Player('AI_2', startingChips),
             new Player('AI_3', startingChips)
         ];
         this.humanPlayer = this.players[0];
+
+        // プレイヤー名も保存
+        localStorage.setItem('poker_player_name', playerName);
     }
 
     async playHand() {
@@ -541,7 +548,14 @@ class TexasHoldem {
             this.log(`${winner.name}が${this.pot}チップを獲得しました！`, true);
 
             await this.sleep(2000);
-            this.checkGameOver();
+
+            // チップ数を保存
+            this.savePlayerChips();
+
+            // ゲームオーバーでなければ次のハンドへ
+            if (!this.checkGameOver()) {
+                this.playHand();
+            }
         }
     }
 
@@ -589,7 +603,7 @@ class TexasHoldem {
         this.showResultScreen(winners, playerHands);
     }
 
-    showResultScreen(winners, allHands) {
+    async showResultScreen(winners, allHands) {
         const resultContent = document.getElementById('result-content');
         resultContent.innerHTML = '';
 
@@ -607,6 +621,16 @@ class TexasHoldem {
         }
 
         this.showScreen('result-screen');
+
+        // チップ数を保存
+        this.savePlayerChips();
+
+        // 3秒後に自動的に次のハンドに進む
+        await this.sleep(3000);
+        if (!this.checkGameOver()) {
+            this.showScreen('game-screen');
+            this.playHand();
+        }
     }
 
     checkGameOver() {
@@ -635,6 +659,15 @@ class TexasHoldem {
             <p>おめでとうございます！</p>
         `;
         this.showScreen('game-over-screen');
+
+        // ゲームオーバーの場合はセーブデータをクリア
+        if (winner === this.humanPlayer) {
+            // プレイヤーが勝った場合もリセット（新たなゲームを始める）
+            TexasHoldem.resetSave();
+        } else {
+            // プレイヤーが負けた場合もリセット
+            TexasHoldem.resetSave();
+        }
     }
 
     updateUI() {
@@ -666,8 +699,8 @@ class TexasHoldem {
             playerCardsEl.appendChild(cardEl);
         }
 
-        // 役の表示
-        if (humanPlayer.hand.length === 2 && this.communityCards.length >= 3) {
+        // 役の表示（リバーのみ：手札2枚+コミュニティカード5枚=7枚）
+        if (humanPlayer.hand.length === 2 && this.communityCards.length === 5) {
             const allCards = [...humanPlayer.hand, ...this.communityCards];
             const [handRank] = HandEvaluator.evaluate(allCards);
             document.getElementById('player-hand-rank').textContent = handRank.display;
@@ -768,6 +801,26 @@ class TexasHoldem {
     sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
+
+    savePlayerChips() {
+        if (this.humanPlayer) {
+            localStorage.setItem('poker_player_chips', this.humanPlayer.chips.toString());
+        }
+    }
+
+    static getSavedChips() {
+        const saved = localStorage.getItem('poker_player_chips');
+        return saved ? parseInt(saved) : null;
+    }
+
+    static getSavedPlayerName() {
+        return localStorage.getItem('poker_player_name') || '';
+    }
+
+    static resetSave() {
+        localStorage.removeItem('poker_player_chips');
+        localStorage.removeItem('poker_player_name');
+    }
 }
 
 // グローバルゲームインスタンス
@@ -775,6 +828,29 @@ let game = null;
 
 // 初期化
 document.addEventListener('DOMContentLoaded', () => {
+    // セーブデータを確認して表示
+    const savedChips = TexasHoldem.getSavedChips();
+    const savedName = TexasHoldem.getSavedPlayerName();
+
+    if (savedChips !== null) {
+        // セーブデータがある場合
+        document.getElementById('saved-game-info').style.display = 'block';
+        document.getElementById('saved-player-name').textContent = savedName || 'プレイヤー';
+        document.getElementById('saved-chips').textContent = savedChips;
+        document.getElementById('reset-save-btn').style.display = 'inline-block';
+
+        // 入力フィールドにセーブデータを反映
+        document.getElementById('player-name').value = savedName || 'プレイヤー';
+    }
+
+    // リセットボタン
+    document.getElementById('reset-save-btn').addEventListener('click', () => {
+        if (confirm('セーブデータを削除して最初からやり直しますか？')) {
+            TexasHoldem.resetSave();
+            location.reload();
+        }
+    });
+
     // スタートボタン
     document.getElementById('start-game-btn').addEventListener('click', () => {
         const playerName = document.getElementById('player-name').value.trim() || 'プレイヤー';
@@ -836,13 +912,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ゲーム終了ボタン
     document.getElementById('quit-game-btn').addEventListener('click', () => {
-        game.showScreen('start-screen');
-        game = null;
+        if (game) {
+            game.savePlayerChips();
+        }
+        location.reload();
     });
 
-    // リスタートボタン
+    // リスタートボタン（ゲームオーバー画面から）
     document.getElementById('restart-game-btn').addEventListener('click', () => {
-        game.showScreen('start-screen');
-        game = null;
+        // ゲームオーバーの場合はチップを保存せずリセット
+        TexasHoldem.resetSave();
+        location.reload();
     });
 });
